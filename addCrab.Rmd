@@ -1,0 +1,126 @@
+---
+title: "Add Crab"
+author: "Danielle Perez"
+date: '2024-01-31'
+output: html_document
+---
+
+##This is the R code for adding crabs to well plates at the beginning of an experiment. Right now it's not very pretty, so you'll have to run this code for every mom, treatment, and chamber.
+
+
+## R Here is where you set up working directory, change the outfile name to include the chamber number, treatment number, and mom name (usually just a letter). Also include the date the crabs are added, as well as the individual chamber number. 
+
+```{r working directory and chamber and treatment info}
+
+install.packages("here")
+ library(here)
+
+# Set the working directory to the project root
+here::set_here()
+
+# Now you can use relative paths based on the project root
+#data_path <- here::here("data", "dataset.csv")
+
+# Read the dataset using the relative path
+#my_data <- read.csv(data_path)
+
+# Perform your analysis using my_data
+
+# this set the path where the output files will be created
+# Set working directory and outfile name
+getwd()
+setwd("C:/Users/kate/Documents/GitHub/addCrab_TransferCrab")
+outFileName <- "addCrab_CH01_treat_h_01_momX.csv"
+#date crabs added to wells & Chamber location
+dateAdded <- "2024_02_03"
+chamber <- "CH01"
+```
+
+## All you should need to change here are the specific well plate ID numbers. If it's the beginning of the crab experiment, you'll likely have 24-well plates, but there should be some info about 12 or 6 well plates, if you need it.
+
+
+```{r Well plate  ID numbers, echo=FALSE}
+
+# this is a vector for well numbers, can be create any legit means, (e.g. comma seperated list)
+(wellIDnum <- c(105,116))
+# Number of wells per plate. Option are 6, 12, or 24
+nWellPerPlate <- 24
+# Wellplate ID. This creates a vector of well plates that will be used
+(plateID <- paste("W", nWellPerPlate, "_", wellIDnum, sep = ""))
+# total number of wells. the length() function returns the number of elements in a vector
+(nWells <- nWellPerPlate * length(plateID))
+#Plate vector for dataframe. This code uses the rep() function to create vectors associated with each well
+plate <- rep(plateID, each = nWellPerPlate)
+wellNumber <- NA
+if(nWellPerPlate == 24){
+  wellLetter <- rep(c("A","B","C","D"), each = 6)
+  wellRow <- rep(c(4:1), each = 6)
+  wellNumber <- rep(c(1:6), 4)
+  well <- paste(wellLetter, wellNumber, sep = "")
+  crabDF <- data.frame(plate, wellLetter, wellRow, wellNumber, well)
+}
+if(nWellPerPlate == 6){
+  wellNumber <- c(1:6)
+  crabDF <- data.frame(plate, wellNumber)
+}
+#View(crabDF)
+```
+
+##Here you'll need to specify the mom name (whichever letter) and treatment group. You'll also have to set the number of crabs per group. I think it should be 24*number of plates being added. 
+
+```{r}
+# plate and well related vectors are added to the data frame that will be output
+# ID of the crab groups populating the wells (usually mom)
+(crabGroupID <- c("X"))
+
+(treat <-c("treat_h_01"))
+
+# number of crab groups
+(nGroups <- length(crabGroupID))
+
+# Number of crabs of each group to place in wells 
+# Use nEqualGroupsize if dividing all the wells equally amoung groups, or use custome sizes
+(nWellsForCrab <- nWells)
+(nEqualGroupsize <- floor(nWellsForCrab / nGroups))
+(nCrabPerGroup <- rep(nEqualGroupsize, nGroups))
+
+# if using user specified number of crabs per group. These correspond to the groups in crabGroupID vector
+# plates of one female's progeny x24
+nCrabPerGroup <- c(48)
+```
+
+##Here you shouldn't need to change anything, but this will paste everything together and spit out your "add crab" file.
+
+```{r}
+#Create empty crab vector that will ultimately list all crabs, tracking chips and blanks
+crab <- character()
+
+#create a vector of crabs of the form groupID_#, with unique number (#) for each crab in the group
+for(i in 1:length(crabGroupID)){
+  crab <- c(crab, paste(crabGroupID[i], c(1:nCrabPerGroup[i]), sep="_"))
+}
+
+#random order of crab vector. The sample() function create an random order of the vector
+(crab <- sample(crab))
+
+#Add date for complete crab ID. Format is groupID_#_date.
+crabID <- paste(chamber, crab, dateAdded, treat, sep = "_")
+
+#create dataframe by adding the crab vectors to the crabDF vector that already contains the wellplate data
+crabDF <- cbind(crabDF, crab, crabID)
+#convert crabSimple from character vector to factor vector for graphing well plate images
+#crabDF$crabSimple <- factor(crabDF$crabSimple)
+# add a colum with the chamber ID 
+crabDF$chamber <- chamber
+#create a location ID of the format Chamber_Plate_Well 
+crabDF$Location <- paste(crabDF$chamber, crabDF$plate, crabDF$well, sep = "_")
+# add a column with the date crabs are added
+crabDF$date <- dateAdded
+#look at the dataframe to make sure is OK
+#View(crabDF)
+
+# Write the output csv file in location specied above
+write.csv(crabDF, file = outFileName)
+
+```
+
