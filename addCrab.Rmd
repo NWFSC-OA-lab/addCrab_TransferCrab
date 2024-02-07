@@ -1,6 +1,6 @@
 ---
 title: "Add Crab"
-author: "Danielle Perez"
+author: "Danielle Perez source, Kate Ruins it on a REPO"
 date: '2024-01-31'
 output: html_document
 ---
@@ -12,11 +12,11 @@ output: html_document
 
 ```{r working directory and chamber and treatment info}
 
-install.packages("here")
- library(here)
+# install.packages("here")
+#  library(here)
 
 # Set the working directory to the project root
-here::set_here()
+# here::set_here()
 
 # Now you can use relative paths based on the project root
 #data_path <- here::here("data", "dataset.csv")
@@ -29,11 +29,11 @@ here::set_here()
 # this set the path where the output files will be created
 # Set working directory and outfile name
 getwd()
-setwd("C:/Users/kate/Documents/GitHub/addCrab_TransferCrab")
-outFileName <- "addCrab_CH01_treat_h_01_momX.csv"
+# setwd("C:/Users/kate/Documents/GitHub/addCrab_TransferCrab")
+outFileName <- "addCrab_CH05_treat_j_h_momP.csv"
 #date crabs added to wells & Chamber location
-dateAdded <- "2024_02_03"
-chamber <- "CH01"
+dateAdded <- "2024_02_06"
+chamber <- "CH05"
 ```
 
 ## All you should need to change here are the specific well plate ID numbers. If it's the beginning of the crab experiment, you'll likely have 24-well plates, but there should be some info about 12 or 6 well plates, if you need it.
@@ -42,7 +42,7 @@ chamber <- "CH01"
 ```{r Well plate  ID numbers, echo=FALSE}
 
 # this is a vector for well numbers, can be create any legit means, (e.g. comma seperated list)
-(wellIDnum <- c(105,116))
+(wellIDnum <- c(202,365))
 # Number of wells per plate. Option are 6, 12, or 24
 nWellPerPlate <- 24
 # Wellplate ID. This creates a vector of well plates that will be used
@@ -73,7 +73,7 @@ if(nWellPerPlate == 6){
 # ID of the crab groups populating the wells (usually mom)
 (crabGroupID <- c("X"))
 
-(treat <-c("treat_h_01"))
+(treat <-c("treat_j_h"))
 
 # number of crab groups
 (nGroups <- length(crabGroupID))
@@ -121,6 +121,17 @@ crabDF$date <- dateAdded
 
 # Write the output csv file in location specied above
 write.csv(crabDF, file = outFileName)
+
+```
+
+
+```{r}
+
+#____________
+# end of doc
+#____________
+
+
 
 ```
 
